@@ -1,0 +1,97 @@
+package com.onlineJob.service;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.onlineJob.dto.ApiResponse;
+import com.onlineJob.CustomException.InvalidInputException;
+import com.onlineJob.CustomException.ResourceNotFoundException;
+
+import com.onlineJob.entities.Job;
+import com.onlineJob.entities.User;
+import com.onlineJob.dto.JobRequestDTO;
+import com.onlineJob.dto.JobResponseDTO;
+
+import com.onlineJob.repository.JobRepository;
+import com.onlineJob.repository.UserRepository;
+
+@Service
+public class JobServiceImpl implements JobService {
+
+    @Autowired
+    private JobRepository jobRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private ModelMapper mapper;
+
+    // ------------------- GET ALL JOBS -------------------
+    @Override
+    public List<JobResponseDTO> getAllJobs() {
+        List<Job> jobs = jobRepository.findAll();
+        List<JobResponseDTO> response = new ArrayList<>();
+
+        for (Job job : jobs) {
+            response.add(convertToDTO(job));
+        }
+        return response;
+    }
+
+
+    @Override
+    public String createJob(JobRequestDTO jobRequestDTO) {
+
+//        User creator = userRepository.findById(jobRequestDTO.getCreatorId())
+//                .orElseThrow(() -> new ResourceNotFoundException("Creator not found"));
+
+        Job job = mapper.map(jobRequestDTO, Job.class);
+
+        // Handle deadline if present
+        if (jobRequestDTO.getDeadline() != null && !jobRequestDTO.getDeadline().isBlank()) {
+            job.setDeadline(LocalDate.parse(jobRequestDTO.getDeadline()));
+        }
+
+//        job.setCreator(creator);
+        jobRepository.save(job);
+
+        return "Job Created Successfully!";
+    }
+
+    // ------------------- GET JOB BY ID -------------------
+    @Override
+    public JobResponseDTO getJobById(Integer id) {
+        Job job = jobRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Job Not Found"));
+
+        return convertToDTO(job);
+    }
+
+    // ------------------- DELETE JOB -------------------
+    @Override
+    public String deleteJob(Integer id) {
+        Job job = jobRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Job Not Found"));
+
+        jobRepository.delete(job);
+        return "Job Deleted Successfully!";
+    }
+
+    // ------------------- DTO CONVERTER -------------------
+    private JobResponseDTO convertToDTO(Job job) {
+
+        JobResponseDTO dto = mapper.map(job, JobResponseDTO.class);
+
+//        if (job.getCreator() != null) {
+//            dto.setCreatorId(job.getCreator().getId());
+//            dto.setCreatorName(job.getCreator().getName() + " " + job.getCreator().getCompanyName());
+//        }
+        return dto;
+    }
+}

@@ -1,0 +1,5 @@
+package com.onlineJob.CustomException;
+
+public class ResourceNotFoundException {
+
+}

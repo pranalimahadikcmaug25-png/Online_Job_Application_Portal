@@ -1,0 +1,5 @@
+package com.onlineJob.Exception;
+
+public class GlobalExceptionHandler {
+
+}

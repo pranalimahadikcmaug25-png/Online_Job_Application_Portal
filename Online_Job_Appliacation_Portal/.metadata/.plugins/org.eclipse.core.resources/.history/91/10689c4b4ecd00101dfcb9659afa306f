@@ -1,0 +1,43 @@
+package com.onlineJob.DTO;
+
+import com.onlineJob.enums.ExperienceLevel;
+import com.onlineJob.enums.JobType;
+import lombok.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class JobResponseDTO {
+
+    private Integer id;
+    private String title;
+    private String description;
+    private String requirements;
+    private String responsibilities;
+    private String company;
+    private String companyLogo;
+    private String location;
+
+    private String salary;
+    private Integer salaryMin;
+    private Integer salaryMax;
+
+    private JobType jobType;
+    private String industry;
+    private ExperienceLevel experienceLevel;
+
+    private LocalDate deadline;
+
+    private Boolean isActive;
+    private Boolean isFeatured;
+    private Integer views;
+    private LocalDateTime postedAt;
+
+    private Integer creatorId;
+    private String creatorName;
+}

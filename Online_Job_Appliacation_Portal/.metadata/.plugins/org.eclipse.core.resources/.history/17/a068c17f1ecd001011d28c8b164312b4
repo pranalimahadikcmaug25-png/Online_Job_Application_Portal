@@ -1,0 +1,5 @@
+package com.onlineJob.dto;
+
+public class UserDto {
+
+}

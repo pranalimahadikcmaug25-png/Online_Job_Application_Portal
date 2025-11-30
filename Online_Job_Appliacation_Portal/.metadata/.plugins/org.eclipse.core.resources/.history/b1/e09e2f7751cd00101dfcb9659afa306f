@@ -1,0 +1,5 @@
+package com.onlineJob.repository;
+
+public class ApplicationRepository {
+
+}

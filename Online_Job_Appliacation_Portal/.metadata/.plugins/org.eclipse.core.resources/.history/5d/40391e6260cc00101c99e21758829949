@@ -1,0 +1,5 @@
+package com.onlineJob.entities;
+
+public class User {
+
+}

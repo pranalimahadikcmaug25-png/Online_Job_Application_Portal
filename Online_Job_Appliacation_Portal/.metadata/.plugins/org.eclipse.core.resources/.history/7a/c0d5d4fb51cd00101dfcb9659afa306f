@@ -1,0 +1,5 @@
+package com.onlineJob.service;
+
+public interface ApplicationService {
+
+}

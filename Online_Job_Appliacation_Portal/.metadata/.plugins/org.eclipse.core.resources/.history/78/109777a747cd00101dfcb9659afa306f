@@ -1,0 +1,57 @@
+package com.onlineJob.controller;
+
+import com.onlineJob.dto.CreateUserDTO;
+import com.onlineJob.dto.LoginRequestDTO;
+import com.onlineJob.dto.LoginResponseDTO;
+import com.onlineJob.dto.UserDTO;
+import com.onlineJob.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/users")
+@RequiredArgsConstructor
+public class UserController {
+
+    private final UserService userService;
+
+    
+    @PostMapping
+    public ResponseEntity<UserDTO> create(@RequestBody CreateUserDTO dto) {
+        return ResponseEntity.status(201).body(userService.createUser(dto));
+    }
+
+    
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDTO> getById(@PathVariable Integer id) {
+        return ResponseEntity.ok(userService.getUserById(id));
+    }
+
+    
+    @GetMapping
+    public ResponseEntity<List<UserDTO>> getAll() {
+        return ResponseEntity.ok(userService.getAllUsers());
+    }
+
+    
+    @PutMapping("/{id}")
+    public ResponseEntity<UserDTO> update(@PathVariable Integer id, @RequestBody UserDTO dto) {
+        return ResponseEntity.ok(userService.updateUser(id, dto));
+    }
+
+    
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Integer id) {
+        userService.deleteUser(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO dto) {
+        return ResponseEntity.ok(userService.login(dto));
+    }
+}

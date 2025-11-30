@@ -1,0 +1,61 @@
+package com.onlineJob.entities;
+
+import com.onlineJob.enums.ApplicationStatus;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity
+@Table(name = "applications")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Application {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(nullable = false)
+    private String fullName;
+
+    @Column(nullable = false)
+    private String email;
+
+    @Column(nullable = false)
+    private String phone;
+
+    @Column(columnDefinition = "TEXT")
+    private String education;
+
+    @Column(columnDefinition = "TEXT")
+    private String experience;
+
+    @Column(columnDefinition = "TEXT")
+    private String skills;
+
+    private String resumeUrl;
+
+    @Column(columnDefinition = "TEXT")
+    private String coverLetter;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ApplicationStatus status;
+
+    @Column(nullable = false)
+    private java.time.LocalDateTime appliedAt = java.time.LocalDateTime.now();
+
+    @ManyToOne
+    @JoinColumn(name = "applicantId")
+    private User applicant;
+
+    @ManyToOne
+    @JoinColumn(name = "jobId")
+    private Job job;
+
+    
+}
+

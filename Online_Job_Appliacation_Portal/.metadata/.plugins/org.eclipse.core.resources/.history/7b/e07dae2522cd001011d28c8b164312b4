@@ -1,0 +1,5 @@
+package com.onlineJob.config;
+
+public class ModelMapperConfig {
+
+}

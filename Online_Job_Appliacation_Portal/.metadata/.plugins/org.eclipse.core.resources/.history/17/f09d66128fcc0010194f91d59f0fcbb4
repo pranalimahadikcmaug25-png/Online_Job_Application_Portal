@@ -1,0 +1,5 @@
+
+public enum Userenums {
+	 candidate, employer, admin
+
+}

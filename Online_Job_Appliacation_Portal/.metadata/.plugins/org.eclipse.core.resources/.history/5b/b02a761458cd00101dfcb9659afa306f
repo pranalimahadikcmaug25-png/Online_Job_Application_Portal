@@ -1,0 +1,33 @@
+package com.onlineJob.dto;
+
+import com.onlineJob.enums.ExperienceLevel;
+import com.onlineJob.enums.JobType;
+import lombok.*;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class JobRequestDTO {
+
+    private String title;
+    private String description;
+    private String requirements;
+    private String responsibilities;
+    private String company;
+    private String companyLogo;
+    private String location;
+
+    private String salary;
+    private Integer salaryMin;
+    private Integer salaryMax;
+
+    private JobType jobType;
+    private String industry;
+    private ExperienceLevel experienceLevel;
+
+    private String deadline;
+
+    private Integer creatorId;  // user ID
+}

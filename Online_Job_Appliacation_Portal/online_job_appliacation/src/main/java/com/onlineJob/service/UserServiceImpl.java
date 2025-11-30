@@ -1,0 +1,98 @@
+package com.onlineJob.service;
+
+import com.onlineJob.dto.CreateUserDTO;
+import com.onlineJob.dto.LoginRequestDTO;
+import com.onlineJob.dto.LoginResponseDTO;
+import com.onlineJob.dto.UserDTO;
+import com.onlineJob.entities.User;
+import com.onlineJob.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class UserServiceImpl implements UserService {
+
+    private final UserRepository userRepo;
+    private final ModelMapper mapper;
+    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+    @Override
+    public UserDTO createUser(CreateUserDTO dto) {
+
+        if (userRepo.findByEmail(dto.getEmail()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already registered");
+        }
+
+        User user = mapper.map(dto, User.class);
+
+        user.setPassword(encoder.encode(dto.getPassword()));
+
+        User saved = userRepo.save(user);
+
+        return mapper.map(saved, UserDTO.class);
+    }
+
+    @Override
+    public UserDTO getUserById(Integer id) {
+        User user = userRepo.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        return mapper.map(user, UserDTO.class);
+    }
+
+    @Override
+    public List<UserDTO> getAllUsers() {
+        return userRepo.findAll()
+                .stream()
+                .map(u -> mapper.map(u, UserDTO.class))
+                .toList();
+    }
+
+    @Override
+    public UserDTO updateUser(Integer id, UserDTO dto) {
+
+        User user = userRepo.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        mapper.map(dto, user);
+
+        User updated = userRepo.save(user);
+
+        return mapper.map(updated, UserDTO.class);
+    }
+
+    @Override
+    public void deleteUser(Integer id) {
+
+        User user = userRepo.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        userRepo.delete(user);
+    }
+
+    @Override
+    public LoginResponseDTO login(LoginRequestDTO dto) {
+
+        User user = userRepo.findByEmail(dto.getEmail())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password"));
+
+        if (!encoder.matches(dto.getPassword(), user.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
+        }
+
+        return LoginResponseDTO.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .role(user.getRole().name())
+                .message("Login successful")
+                .build();
+    }
+}

@@ -1,0 +1,50 @@
+package com.onlineJob.controller;
+
+
+
+import com.onlineJob.dto.JobRequestDTO;
+import com.onlineJob.dto.JobResponseDTO;
+import com.onlineJob.service.JobService;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import jakarta.validation.Valid;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/jobs")
+const [jobs, setJobs] = useState([]);
+
+public class JobController {
+
+    @Autowired
+    private JobService jobService;
+
+
+    @PostMapping
+    public ResponseEntity<String> createJob(@Valid @RequestBody JobRequestDTO jobRequestDTO) {
+        String response = jobService.createJob(jobRequestDTO);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<JobResponseDTO>> getAllJobs() {
+        return ResponseEntity.ok(jobService.getAllJobs());
+    }
+
+
+    @GetMapping("/{id}")
+    public ResponseEntity<JobResponseDTO> getJobById(@PathVariable Integer id) {
+        return ResponseEntity.ok(jobService.getJobById(id));
+    }
+
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteJob(@PathVariable Integer id) {
+        return ResponseEntity.ok(jobService.deleteJob(id));
+    }
+}
+
+

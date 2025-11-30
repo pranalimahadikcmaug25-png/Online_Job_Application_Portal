@@ -1,0 +1,5 @@
+package com.onlineJob.enums;
+
+public enum JobType {
+
+}
