@@ -1,0 +1,189 @@
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { Container, Row, Col, Form, Button, Alert } from "react-bootstrap";
+import { authAPI } from "../api";
+import { useAuth } from "../contexts/AuthContext";
+
+function Login() {
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+  const { login } = useAuth();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    // Form validation
+    if (!formData.email || !formData.password) {
+      setError("Please fill in all fields");
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await authAPI.login(formData);
+      const { token, user } = response.data;
+
+      // Save token and user data
+      login(user, token);
+
+      // Redirect to Home page for all users
+      navigate("/");
+    } catch (err) {
+      setError(err.response?.data?.error || "Login failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  return (
+    <Container className="my-5">
+      <Row className="justify-content-center">
+        <Col md={6} lg={5}>
+          <div className="glass p-5">
+            <div className="text-center mb-4">
+              <h2 className="fw-bold">Welcome Back</h2>
+              <p className="text-muted">Login to your account</p>
+            </div>
+
+            {error && (
+              <Alert variant="danger" role="alert">
+                {error}
+              </Alert>
+            )}
+
+            <Form onSubmit={handleSubmit}>
+              <Form.Group className="mb-3">
+                <Form.Label className="fw-bold">Email *</Form.Label>
+                <Form.Control
+                  type="email"
+                  name="email"
+                  className="form-glass"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  placeholder="Enter your email"
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-4">
+                <Form.Label className="fw-bold">Password *</Form.Label>
+                <div className="position-relative">
+                  <Form.Control
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    className="form-glass"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                    minLength="6"
+                    placeholder="Enter your password"
+                    style={{ paddingRight: '45px' }}
+                  />
+                  <button
+                    type="button"
+                    className="btn btn-sm position-absolute"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{
+                      right: '10px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      border: 'none',
+                      background: 'transparent',
+                      color: '#6c757d',
+                      padding: '6px',
+                      width: '32px',
+                      height: '32px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: '6px',
+                      transition: 'background 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.background = '#f5f5f5'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                    title={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? (
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                        <line x1="1" y1="1" x2="23" y2="23"></line>
+                      </svg>
+                    ) : (
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                      </svg>
+                    )}
+                  </button>
+                </div>
+              </Form.Group>
+
+              <Button
+                type="submit"
+                className="w-100 mb-3"
+                disabled={loading}
+                style={{
+                  background: "linear-gradient(135deg, #4078FF 0%, #3461E0 100%)",
+                  border: "none",
+                  padding: "12px",
+                  borderRadius: "12px",
+                }}
+              >
+                {loading ? "Logging in..." : "Login"}
+              </Button>
+
+              <div className="text-center">
+                <p className="mb-0">
+                  Don't have an account?{" "}
+                  <Link
+                    to="/register"
+                    className="text-decoration-none fw-bold"
+                    style={{ color: "#4078FF" }}
+                  >
+                    Sign Up
+                  </Link>
+                </p>
+              </div>
+            </Form>
+          </div>
+        </Col>
+      </Row>
+    </Container>
+  );
+}
+
+export default Login;
